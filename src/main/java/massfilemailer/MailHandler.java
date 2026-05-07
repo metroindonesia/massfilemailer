@@ -17,9 +17,9 @@ import java.util.Properties;
 
 public class MailHandler {
 
-    public static void handleSend(String directoryPath, String excelPath, String messageBody, App appUI) {
-        if (directoryPath == null || directoryPath.isEmpty() || excelPath == null || excelPath.isEmpty()) {
-            appUI.appendLog("Error: Folder atau File Excel belum dipilih!");
+    public static void handleSend(String directoryPath, String excelPath, String subject, String messageBody, App appUI) {
+        if (directoryPath == null || directoryPath.isEmpty() || excelPath == null || excelPath.isEmpty() || subject == null || subject.isEmpty()) {
+            appUI.appendLog("Error: Folder, File Excel, atau Judul Email belum diisi!");
             return;
         }
 
@@ -59,7 +59,7 @@ public class MailHandler {
                 appUI.updateProgress(progress, "Mengirim ke: " + r.getEmail() + " (" + (i + 1) + "/" + total + ")");
 
                 try {
-                    sendEmailWithAttachment(session, directoryPath, r, messageBody);
+                    sendEmailWithAttachment(session, directoryPath, r, subject, messageBody);
                     successCount++;
                     
                     // Jeda 2 detik agar tidak dianggap spam/membebani server
@@ -79,14 +79,14 @@ public class MailHandler {
         }
     }
 
-    private static void sendEmailWithAttachment(Session session, String dirPath, Recipient r, String body) throws Exception {
+    private static void sendEmailWithAttachment(Session session, String dirPath, Recipient r, String subject, String body) throws Exception {
         String fromEmail = ConfigManager.getProperty("mail.smtp.user", "");
         String senderName = ConfigManager.getProperty("mail.sender.name", "Mass File Mailer");
         
         Message message = new MimeMessage(session);
         message.setFrom(new InternetAddress(fromEmail, senderName));
         message.setRecipients(Message.RecipientType.TO, InternetAddress.parse(r.getEmail()));
-        message.setSubject("File untuk " + r.getNama());
+        message.setSubject(subject.replace("{nama}", r.getNama()));
 
         MimeBodyPart messageBodyPart = new MimeBodyPart();
         messageBodyPart.setText(body.replace("{nama}", r.getNama()));

@@ -84,7 +84,13 @@ public class App extends Application {
             if (f != null) excelField.setText(f.getAbsolutePath());
         });
 
-        Label msgLbl = new Label("3. Isi Pesan Email (gunakan {nama} untuk personalisasi):");
+        Label subjectLbl = new Label("3. Judul Email (gunakan {nama} untuk personalisasi):");
+        subjectLbl.setStyle("-fx-font-weight: bold;");
+        TextField subjectField = new TextField();
+        subjectField.setText("File untuk {nama}");
+        subjectField.setPromptText("Masukkan judul email...");
+
+        Label msgLbl = new Label("4. Isi Pesan Email (gunakan {nama} untuk personalisasi):");
         msgLbl.setStyle("-fx-font-weight: bold;");
         TextArea msgArea = new TextArea();
         msgArea.setText("Dear {nama}\n\nplease see attachment");
@@ -119,14 +125,14 @@ public class App extends Application {
                     sendBtn.setDisable(true);
                     logArea.clear();
                     new Thread(() -> {
-                        MailHandler.handleSend(dirField.getText(), excelField.getText(), msgArea.getText(), this);
+                        MailHandler.handleSend(dirField.getText(), excelField.getText(), subjectField.getText(), msgArea.getText(), this);
                     }).start();
                 }
             });
         });
 
         actionBox.getChildren().addAll(backBtn, sendBtn);
-        layout.getChildren().addAll(headerBox, dirSection, excelSection, msgLbl, msgArea, 
+        layout.getChildren().addAll(headerBox, dirSection, excelSection, subjectLbl, subjectField, msgLbl, msgArea, 
                                    new Label("Status Pengiriman:"), progressBar, statusLabel, logArea, actionBox);
 
         Scene scene = new Scene(layout, 650, 750);
